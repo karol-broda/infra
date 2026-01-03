@@ -1,9 +1,28 @@
-{ pkgs, modulesPath, sshPubKey, ... }:
+{  pkgs, modulesPath, sshPubKey, ... }:
 
 let
   domain = "karolbroda.com";
   matrixDomain = "matrix.${domain}";
   tuwunelPort = 6167;
+
+  cinnyConfig = pkgs.writeText "cinny-config.json" (builtins.toJSON {
+    defaultHomeserver = 0;
+    homeserverList = [ matrixDomain ];
+    allowCustomHomeservers = true;
+  });
+
+  cinnyWithConfig = pkgs.runCommand "cinny-configured" {} ''
+    mkdir -p $out
+    cp -r ${pkgs.cinny}/* $out/
+    chmod -R u+w $out
+    cp ${cinnyConfig} $out/config.json
+    
+    # add catppuccin frappé lavender theme as separate stylesheet
+    cp ${./catppuccin-frappe.css} $out/assets/catppuccin.css
+    
+    # inject link to custom css in index.html (after the main css)
+    ${pkgs.gnused}/bin/sed -i 's|href="/assets/index-[^"]*\.css">|&\n    <link rel="stylesheet" href="/assets/catppuccin.css">|' $out/index.html
+  '';
 in
 {
   imports = [
@@ -60,7 +79,7 @@ in
     '';
 
     virtualHosts = {
-      # main matrix server endpoint
+      # main matrix server endpoint and cinny web client
       "${matrixDomain}" = {
         extraConfig = ''
           reverse_proxy /_matrix/* localhost:${toString tuwunelPort}
@@ -75,6 +94,9 @@ in
             "m.identity_server": {"base_url": "https://matrix.org"},
             "org.matrix.msc3575.proxy": {"url": "https://${matrixDomain}"}
           }`
+
+          root * ${cinnyWithConfig}
+          file_server
         '';
       };
 
@@ -129,4 +151,3 @@ in
     defaults.email = "admin@${domain}";
   };
 }
-

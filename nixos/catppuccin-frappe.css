@@ -1,0 +1,190 @@
+/* catppuccin frappé theme for cinny
+ * source: https://github.com/catppuccin/userstyles/blob/main/styles/cinny/catppuccin.user.less
+ * pre-compiled with frappé flavor and lavender accent
+ */
+
+:root,
+.dark-theme,
+.butter-theme {
+  /* catppuccin frappé palette */
+  --ctp-base: #303446;
+  --ctp-mantle: #292c3c;
+  --ctp-crust: #232634;
+  --ctp-surface0: #414559;
+  --ctp-surface1: #51576d;
+  --ctp-surface2: #626880;
+  --ctp-overlay0: #737994;
+  --ctp-overlay1: #838ba7;
+  --ctp-overlay2: #949cbb;
+  --ctp-subtext0: #a5adce;
+  --ctp-subtext1: #b5bfe2;
+  --ctp-text: #c6d0f5;
+  --ctp-lavender: #babbf1;
+  --ctp-blue: #8caaee;
+  --ctp-sapphire: #85c1dc;
+  --ctp-sky: #99d1db;
+  --ctp-teal: #81c8be;
+  --ctp-green: #a6d189;
+  --ctp-yellow: #e5c890;
+  --ctp-peach: #ef9f76;
+  --ctp-maroon: #ea999c;
+  --ctp-red: #e78284;
+  --ctp-mauve: #ca9ee6;
+  --ctp-pink: #f4b8e4;
+  --ctp-flamingo: #eebebe;
+  --ctp-rosewater: #f2d5cf;
+
+  /* user colors */
+  --mx-uc-1: #8caaee;
+  --mx-uc-2: #f4b8e4;
+  --mx-uc-3: #81c8be;
+  --mx-uc-4: #e78284;
+  --mx-uc-5: #ef9f76;
+  --mx-uc-6: #99d1db;
+  --mx-uc-7: #ca9ee6;
+  --mx-uc-8: #a6d189;
+
+  /* backgrounds */
+  --bg-surface: #303446;
+  --bg-surface-transparent: rgba(48, 52, 70, 0);
+  --bg-surface-low: #292c3c;
+  --bg-surface-low-transparent: rgba(41, 44, 60, 0);
+  --bg-surface-extra-low: #232634;
+  --bg-surface-extra-low-transparent: rgba(35, 38, 52, 0);
+  --bg-surface-border: rgba(35, 38, 52, 0.2);
+  --bg-surface-hover: #414559;
+  --bg-surface-active: #51576d;
+  --bg-overlay: rgba(35, 38, 52, 0.6);
+  --bg-overlay-low: rgba(35, 38, 52, 0.8);
+  --bg-primary: #babbf1;
+  --bg-primary-hover: rgba(186, 187, 241, 0.8);
+  --bg-primary-active: rgba(186, 187, 241, 0.7);
+  --bg-primary-border: rgba(186, 187, 241, 0.38);
+  --bg-tooltip: #414559;
+  --bg-badge: #babbf1;
+  --bg-positive: #a6d189;
+  --bg-positive-hover: rgba(166, 209, 137, 0.08);
+  --bg-positive-active: rgba(166, 209, 137, 0.15);
+  --bg-positive-border: rgba(166, 209, 137, 0.4);
+  --bg-caution: #ef9f76;
+  --bg-caution-hover: rgba(239, 159, 118, 0.08);
+  --bg-caution-active: rgba(239, 159, 118, 0.15);
+  --bg-caution-border: rgba(239, 159, 118, 0.4);
+  --bg-danger: #ea999c;
+  --bg-danger-hover: rgba(234, 153, 156, 0.05);
+  --bg-danger-active: rgba(234, 153, 156, 0.1);
+  --bg-danger-border: rgba(234, 153, 156, 0.2);
+  --bg-ping: rgba(166, 209, 137, 0.4);
+  --bg-ping-hover: rgba(166, 209, 137, 0.5);
+
+  /* text colors */
+  --tc-surface-high: #c6d0f5;
+  --tc-surface-normal: #c6d0f5;
+  --tc-surface-normal-low: #b5bfe2;
+  --tc-surface-low: #a5adce;
+  --tc-primary-high: #232634;
+  --tc-primary-normal: #c6d0f5;
+  --tc-primary-low: #b5bfe2;
+  --tc-tooltip: #a5adce;
+  --tc-code: #babbf1;
+  --tc-link: #8caaee;
+  --tc-badge: #232634;
+  --tc-positive-high: #a6d189;
+  --tc-positive-normal: #a6d189;
+  --tc-positive-low: #a6d189;
+  --tc-caution-high: #ef9f76;
+  --tc-caution-normal: #ef9f76;
+  --tc-caution-low: #ef9f76;
+  --tc-danger-high: #ea999c;
+  --tc-danger-normal: #ea999c;
+  --tc-danger-low: #ea999c;
+
+  /* icon colors */
+  --ic-surface-high: #c6d0f5;
+  --ic-surface-normal: #c6d0f5;
+  --ic-surface-low: #b5bfe2;
+  --ic-primary-high: #232634;
+  --ic-primary-normal: #232634;
+  --ic-primary-low: #232634;
+  --ic-positive-high: #a6d189;
+  --ic-positive-normal: #ea999c;
+  --ic-caution-high: #ef9f76;
+  --ic-caution-normal: #ef9f76;
+  --ic-danger-high: #ea999c;
+  --ic-danger-normal: #ea999c;
+
+  /* cinny internal variables (obfuscated names) */
+  --oq6d070: #292c3c;
+  --oq6d071: #303446;
+  --oq6d072: #414559;
+  --oq6d073: #51576d;
+  --oq6d074: #c6d0f5;
+  --oq6d075: #303446;
+  --oq6d076: #414559;
+  --oq6d077: #51576d;
+  --oq6d078: #626880;
+  --oq6d079: #c6d0f5;
+  --oq6d07a: #292c3c;
+  --oq6d07b: #303446;
+  --oq6d07c: #414559;
+  --oq6d07d: #51576d;
+  --oq6d07e: #c6d0f5;
+  --oq6d07f: #a5adce;
+  --oq6d07g: #949cbb;
+  --oq6d07h: #838ba7;
+  --oq6d07i: #737994;
+  --oq6d07j: #303446;
+  --oq6d07k: rgba(186, 187, 241, 0.5);
+  --oq6d07l: rgba(186, 187, 241, 0.4);
+  --oq6d07m: rgba(186, 187, 241, 0.3);
+  --oq6d07n: rgba(186, 187, 241, 0.2);
+  --oq6d07o: #c6d0f5;
+  --oq6d07p: #b5bfe2;
+  --oq6d07q: #a5adce;
+  --oq6d07r: #949cbb;
+  --oq6d07s: #838ba7;
+  --oq6d07t: #292c3c;
+  --oq6d07u: #414559;
+  --oq6d07v: #51576d;
+  --oq6d07w: #626880;
+  --oq6d07x: #737994;
+  --oq6d07y: #c6d0f5;
+  --oq6d07z: rgba(166, 209, 137, 0.9);
+  --oq6d0710: rgba(166, 209, 137, 0.95);
+  --oq6d0711: rgba(166, 209, 137, 0.975);
+  --oq6d0712: #a6d189;
+  --oq6d0713: #414559;
+  --oq6d0714: rgba(65, 69, 89, 0.975);
+  --oq6d0715: rgba(65, 69, 89, 0.95);
+  --oq6d0716: rgba(65, 69, 89, 0.9);
+  --oq6d0717: rgba(65, 69, 89, 0.8);
+  --oq6d0718: #a6d189;
+  --oq6d0719: rgba(239, 159, 118, 0.9);
+  --oq6d071a: rgba(239, 159, 118, 0.95);
+  --oq6d071b: rgba(239, 159, 118, 0.975);
+  --oq6d071c: #ef9f76;
+  --oq6d071d: rgba(65, 69, 89, 0.975);
+  --oq6d071e: rgba(65, 69, 89, 0.95);
+  --oq6d071f: rgba(65, 69, 89, 0.9);
+  --oq6d071g: rgba(65, 69, 89, 0.8);
+  --oq6d071h: rgba(65, 69, 89, 0.7);
+  --oq6d071i: rgba(234, 153, 156, 0.9);
+  --oq6d071j: rgba(234, 153, 156, 0.95);
+  --oq6d071k: rgba(234, 153, 156, 0.975);
+  --oq6d071l: #ea999c;
+  --oq6d071m: rgba(65, 69, 89, 0.975);
+  --oq6d071n: rgba(65, 69, 89, 0.95);
+  --oq6d071o: rgba(65, 69, 89, 0.9);
+  --oq6d071p: rgba(65, 69, 89, 0.8);
+  --oq6d071q: rgba(65, 69, 89, 0.7);
+  --oq6d071r: rgba(65, 69, 89, 0.6);
+  --oq6d071s: rgba(234, 153, 156, 0.9);
+  --oq6d071t: rgba(198, 208, 245, 0.5);
+  --oq6d071u: #232634;
+  --oq6d071v: rgba(35, 38, 52, 0.6);
+}
+
+/* code syntax highlighting */
+code .token {
+  opacity: 1 !important;
+}
