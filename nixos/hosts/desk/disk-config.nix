@@ -1,4 +1,5 @@
 { ... }:
+
 {
   disko.devices = {
     disk = {
@@ -10,7 +11,7 @@
           partitions = {
             boot = {
               size = "1M";
-              type = "EF02"; # bios boot partition
+              type = "EF02";
             };
             ESP = {
               size = "512M";

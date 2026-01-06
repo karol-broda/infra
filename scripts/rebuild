@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+
+HOST="${1:-}"
+if [ -z "$HOST" ]; then
+  echo "usage: rebuild <hostname>"
+  echo ""
+  echo "available hosts:"
+  nix flake show --json 2>/dev/null | jq -r '.nixosConfigurations | keys[]' 2>/dev/null || echo "  (run from project root to see hosts)"
+  exit 1
+fi
+
+SERVER_IP=$(cd terraform && terraform output -json servers 2>/dev/null | jq -r ".\"$HOST\".ipv4 // empty")
+if [ -z "$SERVER_IP" ]; then
+  echo "error: could not get ip for host '$HOST'. run 'tf apply' first."
+  exit 1
+fi
+
+SSH_KEY="keys/${HOST}-key"
+if [ ! -f "$SSH_KEY" ]; then
+  echo "error: ssh key not found at $SSH_KEY"
+  exit 1
+fi
+
+SSH_OPTS="-i $SSH_KEY -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes"
+
+echo "copying configuration to $HOST..."
+rsync -avz --delete \
+  --include='keys/*.pub' \
+  --exclude='keys/*' \
+  --filter=':- .gitignore' \
+  --exclude='.git' \
+  --exclude='terraform' \
+  --exclude='.direnv' \
+  -e "ssh $SSH_OPTS" \
+  . "root@$SERVER_IP:/etc/nixos/"
+
+echo "rebuilding nixos on $HOST..."
+ssh $SSH_OPTS "root@$SERVER_IP" "cd /etc/nixos && nixos-rebuild switch --flake .#$HOST"
+

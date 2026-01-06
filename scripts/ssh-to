@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+
+HOST="${1:-}"
+shift || true
+
+if [ -z "$HOST" ]; then
+  echo "usage: ssh-to <hostname> [ssh args...]"
+  echo ""
+  echo "available hosts:"
+  if [ -f terraform/terraform.tfstate ]; then
+    cd terraform && terraform output -json servers 2>/dev/null | jq -r 'keys[]' 2>/dev/null || echo "  (no hosts found)"
+  else
+    echo "  (run 'tf apply' first)"
+  fi
+  exit 1
+fi
+
+SERVER_IP=$(cd terraform && terraform output -json servers 2>/dev/null | jq -r ".\"$HOST\".ipv4 // empty")
+if [ -z "$SERVER_IP" ]; then
+  echo "error: could not get ip for host '$HOST'. run 'tf apply' first."
+  exit 1
+fi
+
+SSH_KEY="keys/${HOST}-key"
+if [ ! -f "$SSH_KEY" ]; then
+  echo "error: ssh key not found at $SSH_KEY"
+  exit 1
+fi
+
+exec ssh -4 -i "$SSH_KEY" -o IdentitiesOnly=yes "root@$SERVER_IP" "$@"
+
