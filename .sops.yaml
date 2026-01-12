@@ -1,0 +1,14 @@
+keys:
+  # your personal key (in ~/.config/sops/age/keys.txt)
+  - &user age1fpupstjs0zr4lrs4ucz87wz5ll9e3h53h3495hupjh0n0qkpt53qpywjur
+
+  # host keys (pre-generated, committed to repo for SD images)
+  - &hytale-kiosk age1ulk94gxmtu87hk8vkawxk4n9zkryru054cwtcanukvsftvkq4gtq8ves6s
+
+creation_rules:
+  - path_regex: secrets/hytale-kiosk\.yaml$
+    key_groups:
+      - age:
+          - *user
+          - *hytale-kiosk
+

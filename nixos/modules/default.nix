@@ -1,6 +1,4 @@
-{ ... }:
-
-{
+{...}: {
   imports = [
     ./ssh.nix
     ./acme.nix
@@ -8,6 +6,6 @@
     ./firefly.nix
     ./memos.nix
     ./affine.nix
+    ./kiosk.nix
   ];
 }
-

@@ -1,9 +1,10 @@
-{ config, lib, ... }:
-
-let
-  cfg = config.personal.ssh;
-in
 {
+  config,
+  lib,
+  ...
+}: let
+  cfg = config.personal.ssh;
+in {
   options.personal.ssh = {
     enable = lib.mkEnableOption "ssh access configuration";
 
@@ -27,7 +28,6 @@ in
       };
     };
 
-    networking.firewall.allowedTCPPorts = [ 22 ];
+    networking.firewall.allowedTCPPorts = [22];
   };
 }
-

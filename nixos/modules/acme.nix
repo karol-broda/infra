@@ -1,9 +1,10 @@
-{ config, lib, ... }:
-
-let
-  cfg = config.personal.acme;
-in
 {
+  config,
+  lib,
+  ...
+}: let
+  cfg = config.personal.acme;
+in {
   options.personal.acme = {
     enable = lib.mkEnableOption "acme/letsencrypt certificate management";
 
@@ -20,4 +21,3 @@ in
     };
   };
 }
-

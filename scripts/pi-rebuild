@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+HOST="${1:?host required}"
+TARGET="${2:-$HOST.local}"
+SSH_KEY="keys/${HOST}-key"
+SSH_OPTS="-o StrictHostKeyChecking=accept-new"
+[ -f "$SSH_KEY" ] && SSH_OPTS="$SSH_OPTS -i $SSH_KEY -o IdentitiesOnly=yes"
+
+rsync -avz --delete \
+  --include='keys/*.pub' --exclude='keys/*' \
+  --filter=':- .gitignore' \
+  --exclude='.git' --exclude='terraform' --exclude='.direnv' --exclude='result' \
+  -e "ssh $SSH_OPTS" \
+  . "root@$TARGET:/etc/nixos/"
+
+ssh $SSH_OPTS "root@$TARGET" "cd /etc/nixos && nixos-rebuild switch --flake .#$HOST"

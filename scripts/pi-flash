@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+HOST="${1:?host required}"
+DEVICE="${2:?device required}"
+
+[ -L result ] || nix build ".#images.$HOST"
+IMG=$(find -L result -name "*.img.zst" -o -name "*.img" | head -1)
+
+echo "flashing $IMG to $DEVICE"
+read -p "confirm? [y/N] " -n1 CONFIRM && echo
+[[ "$CONFIRM" =~ ^[Yy]$ ]] || exit 1
+
+if [[ "$IMG" == *.zst ]]; then
+  zstd -d -c "$IMG" | sudo dd of="$DEVICE" bs=4M status=progress conv=fsync
+else
+  sudo dd if="$IMG" of="$DEVICE" bs=4M status=progress conv=fsync
+fi

@@ -1,10 +1,7 @@
-{ sshPubKeys, ... }:
-
-let
+{sshPubKeys, ...}: let
   domain = "karolbroda.com";
   matrixDomain = "matrix.${domain}";
-in
-{
+in {
   imports = [
     ./disk-config.nix
   ];
@@ -38,4 +35,3 @@ in
     email admin@${domain}
   '';
 }
-

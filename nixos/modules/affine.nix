@@ -1,11 +1,20 @@
-{ config, lib, ... }:
-
-let
-  cfg = config.personal.affine;
-in
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.personal.affine;
+  affineImage = "ghcr.io/toeverything/affine:${cfg.version}";
+in {
   options.personal.affine = {
     enable = lib.mkEnableOption "affine notion-like workspace";
+
+    version = lib.mkOption {
+      type = lib.types.str;
+      default = "0.25.7";
+      description = "affine docker image tag";
+    };
 
     domain = lib.mkOption {
       type = lib.types.str;
@@ -35,8 +44,11 @@ in
 
         cmd = [
           "redis-server"
-          "--save" "60" "1"
-          "--loglevel" "warning"
+          "--save"
+          "60"
+          "1"
+          "--loglevel"
+          "warning"
         ];
 
         volumes = [
@@ -57,7 +69,7 @@ in
         autoStart = true;
 
         volumes = [
-          "${cfg.dataDir}/postgres:/var/lib/postgresql/data:U"
+          "${cfg.dataDir}/postgres:/var/lib/postgresql/data"
         ];
 
         environment = {
@@ -77,9 +89,9 @@ in
       };
 
       containers.affine = {
-        image = "ghcr.io/toeverything/affine-graphql:stable";
+        image = affineImage;
         autoStart = true;
-        dependsOn = [ "affine-redis" "affine-postgres" ];
+        dependsOn = ["affine-redis" "affine-postgres"];
 
         ports = [
           "127.0.0.1:${toString cfg.port}:3010"
@@ -93,7 +105,6 @@ in
 
         environment = {
           NODE_ENV = "production";
-          NODE_OPTIONS = "--import=./scripts/register.js";
 
           AFFINE_SERVER_HOST = "0.0.0.0";
           AFFINE_SERVER_PORT = "3010";
@@ -117,7 +128,7 @@ in
 
     systemd.services.podman-affine-network = {
       description = "create podman network for affine";
-      wantedBy = [ "multi-user.target" ];
+      wantedBy = ["multi-user.target"];
       before = [
         "podman-affine.service"
         "podman-affine-redis.service"
@@ -128,6 +139,42 @@ in
         RemainAfterExit = true;
         ExecStart = "${config.virtualisation.podman.package}/bin/podman network create affine-net --ignore";
       };
+    };
+
+    systemd.services.podman-affine-postgres = {
+      after = ["systemd-tmpfiles-setup.service"];
+      requires = ["systemd-tmpfiles-setup.service"];
+      serviceConfig = {
+        ExecStartPre = [
+          "+${pkgs.coreutils}/bin/install -d -m 0750 -o 70 -g 70 ${cfg.dataDir}/postgres"
+        ];
+      };
+    };
+
+    systemd.services.affine-migration = {
+      description = "run affine database migrations";
+      after = [
+        "podman-affine-postgres.service"
+        "podman-affine-redis.service"
+        "podman-affine-network.service"
+      ];
+      requires = [
+        "podman-affine-postgres.service"
+        "podman-affine-redis.service"
+      ];
+      before = ["podman-affine.service"];
+      wantedBy = ["multi-user.target"];
+
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        ExecStart = "${config.virtualisation.podman.package}/bin/podman run --rm --network=affine-net -e DATABASE_URL=postgresql://affine:affine@affine-postgres:5432/affine -e REDIS_SERVER_HOST=affine-redis ${affineImage} node ./scripts/self-host-predeploy";
+      };
+    };
+
+    systemd.services.podman-affine = {
+      after = ["affine-migration.service"];
+      requires = ["affine-migration.service"];
     };
 
     systemd.tmpfiles.rules = [
@@ -149,7 +196,6 @@ in
       };
     };
 
-    networking.firewall.allowedTCPPorts = [ 80 443 ];
+    networking.firewall.allowedTCPPorts = [80 443];
   };
 }
-

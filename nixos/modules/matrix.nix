@@ -1,11 +1,14 @@
-{ config, lib, pkgs, ... }:
-
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
   cfg = config.personal.matrix;
 
   cinnyConfig = pkgs.writeText "cinny-config.json" (builtins.toJSON {
     defaultHomeserver = 0;
-    homeserverList = [ cfg.domain ];
+    homeserverList = [cfg.domain];
     allowCustomHomeservers = true;
   });
 
@@ -14,14 +17,13 @@ let
     cp -r ${pkgs.cinny}/* $out/
     chmod -R u+w $out
     cp ${cinnyConfig} $out/config.json
-    
+
     if [ -n "${cfg.cinnyThemeCss}" ]; then
       cp ${cfg.cinnyThemeCss} $out/assets/custom-theme.css
       ${pkgs.gnused}/bin/sed -i 's|href="/assets/index-[^"]*\.css">|&\n    <link rel="stylesheet" href="/assets/custom-theme.css">|' $out/index.html
     fi
   '';
-in
-{
+in {
   options.personal.matrix = {
     enable = lib.mkEnableOption "matrix homeserver with tuwunel";
 
@@ -56,7 +58,7 @@ in
 
     trustedServers = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ "matrix.org" ];
+      default = ["matrix.org"];
       description = "trusted servers for federation";
     };
   };
@@ -82,8 +84,8 @@ in
             }`
 
             ${lib.optionalString cfg.enableCinny ''
-            root * ${cinnyWithConfig}
-            file_server
+              root * ${cinnyWithConfig}
+              file_server
             ''}
           '';
         };
@@ -101,8 +103,8 @@ in
       settings = {
         global = {
           server_name = cfg.domain;
-          address = [ "127.0.0.1" "::1" ];
-          port = [ cfg.port ];
+          address = ["127.0.0.1" "::1"];
+          port = [cfg.port];
           allow_registration = cfg.allowRegistration;
           allow_federation = true;
           allow_encryption = true;
@@ -112,7 +114,6 @@ in
       };
     };
 
-    networking.firewall.allowedTCPPorts = [ 80 443 8448 ];
+    networking.firewall.allowedTCPPorts = [80 443 8448];
   };
 }
-

@@ -1,9 +1,11 @@
-{ config, lib, pkgs, ... }:
-
-let
-  cfg = config.personal.firefly;
-in
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.personal.firefly;
+in {
   options.personal.firefly = {
     enable = lib.mkEnableOption "firefly-iii personal finance manager";
 
@@ -38,13 +40,13 @@ in
     # generate app key if it doesn't exist
     systemd.services.firefly-iii-init = {
       description = "Initialize Firefly III app key";
-      wantedBy = [ "multi-user.target" ];
-      before = [ "firefly-iii-setup.service" "phpfpm-firefly-iii.service" ];
+      wantedBy = ["multi-user.target"];
+      before = ["firefly-iii-setup.service" "phpfpm-firefly-iii.service"];
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
       };
-      path = [ pkgs.coreutils ];
+      path = [pkgs.coreutils];
       script = ''
         if [ ! -f "${cfg.appKeyFile}" ]; then
           mkdir -p "$(dirname "${cfg.appKeyFile}")"
@@ -57,7 +59,7 @@ in
     };
 
     # allow caddy to access the php-fpm socket
-    users.users.caddy.extraGroups = [ "firefly-iii" ];
+    users.users.caddy.extraGroups = ["firefly-iii"];
 
     services.caddy = {
       enable = true;
@@ -80,6 +82,6 @@ in
       };
     };
 
-    networking.firewall.allowedTCPPorts = [ 80 443 ];
+    networking.firewall.allowedTCPPorts = [80 443];
   };
 }

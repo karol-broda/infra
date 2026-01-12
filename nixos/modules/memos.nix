@@ -1,9 +1,10 @@
-{ config, lib, ... }:
-
-let
-  cfg = config.personal.memos;
-in
 {
+  config,
+  lib,
+  ...
+}: let
+  cfg = config.personal.memos;
+in {
   options.personal.memos = {
     enable = lib.mkEnableOption "memos note-taking app";
 
@@ -62,7 +63,6 @@ in
       };
     };
 
-    networking.firewall.allowedTCPPorts = [ 80 443 ];
+    networking.firewall.allowedTCPPorts = [80 443];
   };
 }
-
