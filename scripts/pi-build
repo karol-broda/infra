@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-cd "$(git rev-parse --show-toplevel)"
-export MATRIX_SERVER_ROOT="$(pwd)"
-nix build ".#images.${1:?host required}" --impure
-echo "image: $(readlink -f result)"

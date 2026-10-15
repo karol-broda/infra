@@ -1,0 +1,23 @@
+# state
+*.tfstate
+*.tfstate.*
+.terraform/
+
+*.tfvars
+*.tfvars.json
+
+inventory.auto.tfvars.json
+
+# crash logs
+crash.log
+crash.*.log
+
+# override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# generated files
+*.pem
+*.key

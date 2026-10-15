@@ -1,36 +1,13 @@
 #!/usr/bin/env bash
-set -euo pipefail
-
-cd "$(git rev-parse --show-toplevel)"
+# shellcheck source=lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 HOST="${1:-}"
-if [ -z "$HOST" ]; then
-  echo "usage: destroy <hostname>"
-  echo ""
-  echo "available hosts:"
-  if [ -f terraform/terraform.tfstate ]; then
-    cd terraform && terraform output -json servers 2>/dev/null | jq -r 'keys[]' 2>/dev/null || echo "  (no hosts found)"
-  else
-    echo "  (run 'tf apply' first)"
-  fi
-  exit 1
-fi
+[ -n "$HOST" ] || usage "destroy <hostname>"
 
-echo "broo, this will destroy server '$HOST':"
-read -p "are you sure? [y/N] " -n 1 -r
-echo ""
+echo "broo, this will destroy server '$HOST' and its dns records."
+echo "review the plan below before approving."
+echo
 
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-  echo "aborted"
-  exit 1
-fi
-
-cd terraform
-
-terraform destroy \
-  -target="module.stack[\"$HOST\"]" \
-  -auto-approve
-
-echo ""
-echo "server '$HOST' destroyed."
-
+write_inventory
+run_tofu destroy -target="module.stack[\"$HOST\"]"

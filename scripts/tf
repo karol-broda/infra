@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-set -euo pipefail
+# shellcheck source=lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+case "${1:-}" in
+plan | apply | destroy | import | refresh | console | validate) write_inventory ;;
+esac
 
-cd "$(git rev-parse --show-toplevel)/terraform"
-exec terraform "$@"
-
+run_tofu "$@"

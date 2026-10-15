@@ -1,15 +1,7 @@
 # nix
 result
 result-*
-
-# secrets
-*.tfvars
-!*.tfvars.example
-
-# private keys are managed by 1password (public keys are ok to commit)
-keys/*
-!keys/.gitignore
-!keys/*.pub
+.direnv/
 
 # editor
 .idea/
@@ -17,10 +9,3 @@ keys/*
 *.swp
 *.swo
 *~
-
-secrets/wifi.nix
-nixos/hosts/hytale-kiosk/wifi.nix
-
-[38;2;198;208;245m# sops age keys for hosts (needed in SD images)[0m
-[38;2;198;208;245m!keys/age/[0m
-[38;2;198;208;245m!keys/age/*.txt[0m
