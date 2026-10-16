@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-# shellcheck source=lib.sh
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
-
-HOST="${1:-}"
-[ -n "$HOST" ] || usage "rebuild <hostname>"
-
-push_and_switch "$HOST" "$(host_ip "$HOST")"

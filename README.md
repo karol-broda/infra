@@ -49,20 +49,22 @@ then:
 
 ### layout
 
-- `hosts/default.nix` - inventory, the one place a machine is declared
-- `hosts/<name>/` - per-host nixos config
-- `modules/nixos/` - `core/` (site, ssh, caddy, nix) and `services/`
-- `modules/nixos/profiles/` - `server` (hetzner vm, the only profile so far)
-- `flake/` - flake-parts modules, `lib/` - nix helpers
-- `infra/` - opentofu, `scripts/` - deploy helpers
+every directory owns the nix that builds it; `flake.nix` only wires them together
+(plus the devshell and formatter).
+
+- `hosts/` - `inventory.nix` (domain, admin age keys, servers) and one directory per machine
+- `modules/nixos/` - `core/` (site, ssh, caddy, dns, nix), `services/`, `profiles/`
+- `secrets/` - sops files; creation rules are generated from the inventory
+- `infra/` - opentofu; servers and dns come from the inventory and host configs
+- `scripts/` - one `<name>.nix` or `<name>/default.nix` per script, discovered automatically; shared bash in `lib/`
 
 ---
 
 ### adding a new server
 
-1. add it to `hosts/default.nix` with `hcloud.serverType`
+1. add it to `hosts/inventory.nix` with `hcloud.serverType` (plus `ageKey` once it has secrets)
 2. make a home for it in `hosts/<name>/`
-3. `tf apply` to birth the box (dns comes from its caddy sites)
+3. `tf apply` to birth the box (dns comes from its caddy sites and `personal.dns.records`)
 4. `deploy <name>` to give it life
 
 ---

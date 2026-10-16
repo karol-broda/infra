@@ -6,7 +6,7 @@
   options.personal = {
     domain = lib.mkOption {
       type = lib.types.str;
-      description = "base domain all hosts and services live under (set from hosts/default.nix)";
+      description = "base domain all hosts and services live under (set from hosts/inventory.nix)";
     };
 
     adminEmail = lib.mkOption {

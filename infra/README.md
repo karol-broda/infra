@@ -1,16 +1,17 @@
 # infra
 
 opentofu for hetzner servers, cloudflare dns and 1password key storage.
-always run it through `tf` (scripts/tf), never `tofu` directly.
+always run it through `tf` (or `nix run .#tf`), never `tofu` directly.
 
 ## how inputs get here
 
 - **credentials** (`hcloud_token`, `cloudflare_api_token`, ...) live in
   `secrets/infra.yaml` (sops, your age key only). `tf` exports each key as
   `TF_VAR_<key>`. edit with `sops secrets/infra.yaml`.
-- **servers and dns** come from `hosts/default.nix`. `tf` renders it
+- **servers and dns** come from `hosts/inventory.nix`. `tf` renders it
   with `nix eval .#infra` into `inventory.auto.tfvars.json` (gitignored).
-  every caddy virtual host a nixos config serves becomes a CNAME to its host.
+  dns records come from each host's `personal.dns.records`; every caddy
+  site under the domain becomes a CNAME to its host automatically.
 
 ## state
 

@@ -1,29 +1,55 @@
 {
-  domain = "karolbroda.com";
+  inputs,
+  lib,
+  secrets,
+  ...
+}: let
+  raw = import ./inventory.nix;
 
-  hosts = {
-    matrix = {
+  hosts = lib.mapAttrs (_: host:
+    {
       system = "x86_64-linux";
       profile = "server";
-      hcloud.serverType = "cx23";
-      dns.extra = [
+      ageKey = null;
+    }
+    // host)
+  raw.hosts;
+
+  inventory = {
+    inherit (raw) domain admins;
+    inherit hosts;
+    servers = lib.filterAttrs (_: host: host ? hcloud) hosts;
+  };
+
+  sshKeysFor = name: let
+    path = ../keys + "/${name}-key.pub";
+  in
+    lib.optional (builtins.pathExists path) (lib.trim (builtins.readFile path));
+
+  mkHost = name: host:
+    inputs.nixpkgs.lib.nixosSystem {
+      specialArgs = {inherit inputs;};
+      modules = [
+        inputs.sops-nix.nixosModules.sops
+        ../modules/nixos
+        ../modules/nixos/profiles/${host.profile}.nix
+        ./${name}
         {
-          name = "_matrix._tcp.matrix";
-          type = "SRV";
-          data = {
-            priority = 10;
-            weight = 5;
-            port = 8448;
-            target = "matrix.karolbroda.com";
+          nixpkgs.hostPlatform = host.system;
+          networking.hostName = lib.mkDefault name;
+          personal = {
+            inherit (inventory) domain;
+            ssh.authorizedKeys = sshKeysFor name;
           };
+          sops.defaultSopsFile = lib.mkIf (secrets.hostFile name != null) (secrets.hostFile name);
         }
       ];
     };
+in {
+  _module.args.inventory = inventory;
 
-    desk = {
-      system = "x86_64-linux";
-      profile = "server";
-      hcloud.serverType = "cx23";
-    };
+  flake = {
+    nixosModules.default = ../modules/nixos;
+    nixosConfigurations = lib.mapAttrs mkHost hosts;
   };
 }

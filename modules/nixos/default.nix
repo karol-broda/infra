@@ -4,6 +4,7 @@
     ./core/nix.nix
     ./core/ssh.nix
     ./core/caddy.nix
+    ./core/dns.nix
 
     ./services/affine.nix
     ./services/attic.nix

@@ -6,19 +6,14 @@
 in {
   system.stateVersion = "25.11";
 
-  sops = {
-    defaultSopsFile = ../../secrets/desk.yaml;
-    age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
-
-    secrets = {
-      netbird_encryption_key.mode = "0440";
-      netbird_coturn_password = {
-        owner = "turnserver";
-        mode = "0400";
-      };
-      pocketid_encryption_key.mode = "0440";
-      attic_credentials.mode = "0400";
+  sops.secrets = {
+    netbird_encryption_key.mode = "0440";
+    netbird_coturn_password = {
+      owner = "turnserver";
+      mode = "0400";
     };
+    pocketid_encryption_key.mode = "0440";
+    attic_credentials.mode = "0400";
   };
 
   personal = {

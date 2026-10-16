@@ -26,14 +26,61 @@
   };
 
   outputs = inputs:
-    inputs.flake-parts.lib.mkFlake {inherit inputs;} {
+    inputs.flake-parts.lib.mkFlake {inherit inputs;} ({lib, ...}: {
       systems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
 
       imports = [
-        ./flake/hosts.nix
-        ./flake/infra.nix
-        ./flake/devshell.nix
-        ./flake/formatter.nix
+        inputs.treefmt-nix.flakeModule
+        ./hosts
+        ./secrets
+        ./infra
+        ./scripts
       ];
-    };
+
+      perSystem = {
+        config,
+        self',
+        pkgs,
+        ...
+      }: let
+        scripts = lib.filterAttrs (_: p: p.passthru.isScript or false) self'.packages;
+      in {
+        treefmt = {
+          projectRootFile = "flake.nix";
+          programs = {
+            alejandra.enable = true;
+            deadnix.enable = true;
+            terraform.enable = true;
+            shfmt.enable = true;
+          };
+        };
+
+        devShells.default = pkgs.mkShell {
+          packages =
+            lib.attrValues self'.packages
+            ++ [
+              pkgs.opentofu
+              pkgs.age
+              pkgs.ssh-to-age
+              pkgs.jq
+              config.treefmt.build.wrapper
+            ];
+
+          shellHook = ''
+            if [ -n "''${ZSH_VERSION:-}" ]; then
+              ${lib.concatMapStrings (p: p.passthru.zshCompletion) (lib.attrValues scripts)}
+            fi
+
+            if [ -n "''${PS1:-}" ]; then
+              tofu -version | head -1
+              echo
+              ${lib.concatStrings (lib.mapAttrsToList (name: p: ''
+                printf '  %-10s %s\n' ${lib.escapeShellArgs [name p.meta.description]}
+              '')
+              scripts)}
+            fi
+          '';
+        };
+      };
+    });
 }

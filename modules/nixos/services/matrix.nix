@@ -5,6 +5,7 @@
   ...
 }: let
   cfg = config.personal.matrix;
+  federationPort = 8448;
 
   cinnyConfig = pkgs.writeText "cinny-config.json" (builtins.toJSON {
     defaultHomeserver = 0;
@@ -98,7 +99,7 @@ in {
           '';
         };
 
-        "${cfg.domain}:8448" = {
+        "${cfg.domain}:${toString federationPort}" = {
           extraConfig = ''
             reverse_proxy localhost:${toString cfg.port}
           '';
@@ -122,6 +123,19 @@ in {
       };
     };
 
-    networking.firewall.allowedTCPPorts = [8448];
+    networking.firewall.allowedTCPPorts = [federationPort];
+
+    personal.dns.records = [
+      {
+        name = "_matrix._tcp.${lib.removeSuffix ".${config.personal.domain}" cfg.domain}";
+        type = "SRV";
+        data = {
+          priority = 10;
+          weight = 5;
+          port = federationPort;
+          target = cfg.domain;
+        };
+      }
+    ];
   };
 }

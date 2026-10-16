@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-# shellcheck source=lib.sh
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
-case "${1:-}" in
-plan | apply | destroy | import | refresh | console | validate) write_inventory ;;
-esac
-
-run_tofu "$@"
